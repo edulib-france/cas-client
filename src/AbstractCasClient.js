@@ -13,7 +13,9 @@ class AbstractCasClient {
     }
     if (!options.cas.serverUrl) { throw new Error('missing cas server url'); }
     if (!options.cas.loginUrl) { throw new Error('missing cas login url'); }
-    if (!options.cas.validateUrl) { throw new Error('missing cas validate url'); }
+    if (!options.cas.validateUrl) {
+      throw new Error('missing cas validate url');
+    }
     if (!options.cas.logoutUrl) { throw new Error('missing cas logout url'); }
     this.options = options;
     this.logger = new Logger(options.logger);
@@ -60,7 +62,7 @@ class AbstractCasClient {
     if (!req.query || !req.query.ticket) {
       next(new Error('missing cas ticket'));
     }
-    var options = this._buildValidateOptions(req);
+    var options = this._buildValidateReqOptions(req);
     request(options, (err, res, body) => {
       if (err) { return next(err); }
       if (res.statusCode !== 200) {
@@ -82,17 +84,8 @@ class AbstractCasClient {
     res.redirect(this.logoutUrl);
   }
 
-  _buildValidateOptions(req) {
-    var originalUrl = url.parse(req.originalUrl);
-    var service = this.serviceUrl ||
-      `${req.get('host')}${originalUrl.pathname}`;
-    return {
-      host: this.validateUrl.host,
-      method: this.validateUrl.method,
-      port: 'GET',
-      pathname: this.validateUrl.pathname,
-      query: { service, ticket: req.query.ticket }
-    };
+  _buildValidateReqOptions() {
+    throw new Error('missing build validate request options');
   }
 
   _parseCasResponse() {
