@@ -20,15 +20,38 @@ class CasClient extends AbstractCasClient {
   }
 
   _buildValidateReqOptions(req) {
-    var originalUrl = url.parse(req.originalUrl);
-    var service = this.serviceUrl ||
-      `${req.get('host')}${originalUrl.pathname}`;
+      var service = url.parse(this.serverUrl);
+      service.pathname = url.parse(req.originalUrl).pathname;
+      service.query = {};
+      for (var key in req.query) {
+        if (req.query.hasOwnProperty(key) && key !== 'ticket') {
+          service.query[key] = req.query[key];
+        }
+      }
+      service = url.format(service);
+      var now = new Date();
+      var data = `<?xml version="1.0" encoding="utf-8"?>
+      <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+        <SOAP-ENV:Header/>
+        <SOAP-ENV:Body>
+          <samlp:Request xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" MajorVersion="1"
+            MinorVersion="1" RequestID="_${req.get(`host`)}.${now.getTime()}"
+            IssueInstant="${now.toISOString()}">
+            <samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact>
+          </samlp:Request>
+        </SOAP-ENV:Body>
+      </SOAP-ENV:Envelope>`;
     return {
       host: this.validateUrl.host,
       method: this.validateUrl.method,
-      port: 'GET',
+      port: 'POST',
       pathname: this.validateUrl.pathname,
-      query: { service, ticket: req.query.ticket }
+      query: { TARGET: service, ticket: '' },
+      headers: {
+        'Content-Type': 'text/xml',
+        'Content-Length': Buffer.byteLength(data)
+      },
+      body: data
     };
   }
 

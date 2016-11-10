@@ -31,7 +31,7 @@ class AbstractCasClient {
       reniew: options.cas.reniew === true
     };
     this.sessionName = options.sessionName || DefaultSessionName;
-    this.serviceUrl = options.serverUrl;
+    this.serverUrl = options.serverUrl;
     this.loginUrl = url.resolve(this.cas.serverUrl, this.cas.loginUrl);
     this.validateUrl =
       url.parse(url.resolve(this.cas.serverUrl, this.cas.validateUrl));
