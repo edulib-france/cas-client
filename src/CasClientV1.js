@@ -18,7 +18,7 @@ class CasClient extends AbstractCasClient {
   }
 
   _buildValidateReqOptions(req) {
-    var service = url.parse(this.serverUrl);
+    var service = url.parse(this.serviceUrl);
     service.pathname = url.parse(req.originalUrl).pathname;
     service.query = {};
     for (var key in req.query) {

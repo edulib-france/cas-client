@@ -11,7 +11,7 @@ class AbstractCasClient {
     if (!options || !options.cas) {
       throw new Error('missing or invalid options');
     }
-    if (!options.cas.serverUrl) { throw new Error('missing cas server url'); }
+    if (!options.cas.serviceUrl) { throw new Error('missing cas service url'); }
     if (!options.cas.loginUrl) { throw new Error('missing cas login url'); }
     if (!options.cas.validateUrl) {
       throw new Error('missing cas validate url');
@@ -21,7 +21,7 @@ class AbstractCasClient {
     this.logger = new Logger(options.logger);
     if (options.debug === true) { this.logger.setLvl('debug'); }
     this.cas = {
-      serverUrl: options.cas.serverUrl,
+      serviceUrl: options.cas.serviceUrl,
       loginUrl: options.cas.loginUrl.startsWith('/') ?
         options.cas.loginUrl : `/${options.cas.loginUrl}`,
       validateUrl: options.cas.validateUrl.startsWith('/') ?
@@ -31,11 +31,11 @@ class AbstractCasClient {
       reniew: options.cas.reniew === true
     };
     this.sessionName = options.sessionName || DefaultSessionName;
-    this.serverUrl = options.serverUrl;
-    this.loginUrl = url.resolve(this.cas.serverUrl, this.cas.loginUrl);
+    this.serviceUrl = this.cas.serviceUrl;
+    this.loginUrl = url.resolve(this.cas.serviceUrl, this.cas.loginUrl);
     this.validateUrl =
-      url.parse(url.resolve(this.cas.serverUrl, this.cas.validateUrl));
-    this.logoutUrl = url.resolve(this.cas.serverUrl, this.cas.logoutUrl);
+      url.parse(url.resolve(this.cas.serviceUrl, this.cas.validateUrl));
+    this.logoutUrl = url.resolve(this.cas.serviceUrl, this.cas.logoutUrl);
     this.logger.debug({
       cas: this.cas,
       sessionName: this.sessionName,
@@ -46,19 +46,13 @@ class AbstractCasClient {
   }
 
   login(req, res, next) {
-    if (req.session && req.session[this.sessionName]) {
-      next();
-    }
-    if (req.query && req.query.ticket) {
-      next();
-    }
+    if (req.session && req.session[this.sessionName]) { next(); }
+    if (req.query && req.query.ticket) { next(); }
     res.redirect(this.loginUrl);
   }
 
   validate(req, res, next) {
-    if (req.session && req.session[this.sessionName]) {
-      next();
-    }
+    if (req.session && req.session[this.sessionName]) { next(); }
     if (!req.query || !req.query.ticket) {
       next(new Error('missing cas ticket'));
     }

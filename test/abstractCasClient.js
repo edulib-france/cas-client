@@ -16,15 +16,15 @@ assert.throws(
   () => new AbstractCasClient({}), /missing or invalid options/,
   `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
-console.log('\tno cas server url');
+console.log('\tno cas service url');
 assert.throws(
-  () => new AbstractCasClient({ cas: {} }), /missing cas server url/,
+  () => new AbstractCasClient({ cas: {} }), /missing cas service url/,
   `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
 console.log('\tno cas login url');
 assert.throws(
   () => new AbstractCasClient({
-    cas: { serverUrl: 'https://cas-server' }
+    cas: { serviceUrl: 'https://cas-service' }
   }), /missing cas login url/,
   `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
@@ -32,7 +32,7 @@ console.log('\tno cas validate url');
 assert.throws(
   () => new AbstractCasClient({
     cas: {
-      serverUrl: 'https://cas-server',
+      serviceUrl: 'https://cas-service',
       loginUrl: '/login'
     }
   }), /missing cas validate url/,
@@ -42,7 +42,7 @@ console.log('\tno cas logout url');
 assert.throws(
   () => new AbstractCasClient({
     cas: {
-      serverUrl: 'https://cas-server',
+      serviceUrl: 'https://cas-service',
       loginUrl: '/login',
       validateUrl: '/validate'
     }
@@ -53,7 +53,7 @@ console.log('\tvalid options');
 assert.doesNotThrow(
   () => new AbstractCasClient({
     cas: {
-      serverUrl: 'https://cas-server',
+      serviceUrl: 'https://cas-service',
       loginUrl: '/login',
       validateUrl: '/validate',
       logoutUrl: '/logout'

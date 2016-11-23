@@ -20,7 +20,7 @@ class CasClient extends AbstractCasClient {
   }
 
   _buildValidateReqOptions(req) {
-      var service = url.parse(this.serverUrl);
+      var service = url.parse(this.serviceUrl);
       service.pathname = url.parse(req.originalUrl).pathname;
       service.query = {};
       for (var key in req.query) {
@@ -29,18 +29,20 @@ class CasClient extends AbstractCasClient {
         }
       }
       service = url.format(service);
-      var now = new Date();
-      var data = `<?xml version="1.0" encoding="utf-8"?>
+      // jshint ignore:start 
+      var data =
+      `<?xml version="1.0" encoding="utf-8"?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header/>
         <SOAP-ENV:Body>
           <samlp:Request xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" MajorVersion="1"
-            MinorVersion="1" RequestID="_${req.get(`host`)}.${now.getTime()}"
-            IssueInstant="${now.toISOString()}">
+            MinorVersion="1" RequestID="_${req.get(`host`)}.${Date.now().getTime()}"
+            IssueInstant="${Date.now().toISOString()}">
             <samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact>
           </samlp:Request>
         </SOAP-ENV:Body>
       </SOAP-ENV:Envelope>`;
+      // jshint ignore:end
     return {
       host: this.validateUrl.host,
       method: this.validateUrl.method,
@@ -49,9 +51,9 @@ class CasClient extends AbstractCasClient {
       query: { TARGET: service, ticket: '' },
       headers: {
         'Content-Type': 'text/xml',
-        'Content-Length': Buffer.byteLength(data)
+        'Content-Length': Buffer.byteLength(data) // jshint ignore:line
       },
-      body: data
+      body: data // jshint ignore:line
     };
   }
 
@@ -84,9 +86,6 @@ class CasClient extends AbstractCasClient {
         samlResponse.assertion.authenticationstatement.subject ?
         samlResponse.assertion.authenticationstatement.subject.nameidentifier :
         null;
-      if (!user) {
-        return cb(new Error(`invalid CAS server response, missing user`));
-      }
       var attrs = samlResponse.assertion.attributestatement ?
         samlResponse.assertion.attributestatement.attribute : [];
       var data = { user };
