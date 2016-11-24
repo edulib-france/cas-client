@@ -3,6 +3,7 @@
 const url = require('url');
 const request = require('request');
 const Logger = require('./Logger');
+const urljoin = require('url-join');
 const DefaultSessionName = 'cas';
 
 class AbstractCasClient {
@@ -35,10 +36,10 @@ class AbstractCasClient {
     this.sessionName = options.sessionName || DefaultSessionName;
     this.serviceUrl = this.cas.serviceUrl;
     this.serverUrl = this.cas.serverUrl;
-    this.loginUrl = url.resolve(this.cas.serverUrl, this.cas.loginUrl);
+    this.loginUrl = urljoin(this.cas.serverUrl, this.cas.loginUrl);
     this.validateUrl =
-      url.parse(url.resolve(this.cas.serverUrl, this.cas.validateUrl));
-    this.logoutUrl = url.resolve(this.cas.serverUrl, this.cas.logoutUrl);
+      url.parse(urljoin(this.cas.serverUrl, this.cas.validateUrl));
+    this.logoutUrl = urljoin(this.cas.serverUrl, this.cas.logoutUrl);
     this.logger.debug({
       cas: this.cas,
       sessionName: this.sessionName,
