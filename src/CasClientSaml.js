@@ -10,28 +10,28 @@ const DefaultLogoutUrl = '/logout';
 
 class CasClient extends AbstractCasClient {
 
-    constructor(options) {
-        options = options || {};
-        options.cas = options.cas || {};
-        options.cas.loginUrl = options.cas.loginUrl || DefaultLoginUrl;
-        options.cas.validateUrl = options.cas.validateUrl || DefaultValidateUrl;
-        options.cas.logoutUrl = options.cas.logoutUrl || DefaultLogoutUrl;
-        super(options);
-    }
+  constructor(options) {
+    options = options || {};
+    options.cas = options.cas || {};
+    options.cas.loginUrl = options.cas.loginUrl || DefaultLoginUrl;
+    options.cas.validateUrl = options.cas.validateUrl || DefaultValidateUrl;
+    options.cas.logoutUrl = options.cas.logoutUrl || DefaultLogoutUrl;
+    super(options);
+  }
 
-    _buildValidateReqOptions(req) {
-            var service = url.parse(this.serviceUrl);
-            service.pathname = url.parse(req.originalUrl).pathname;
-            service.query = {};
-            for (var key in req.query) {
-                if (req.query.hasOwnProperty(key) && key !== 'ticket') {
-                    service.query[key] = req.query[key];
-                }
-            }
-            service = url.format(service);
-            // jshint ignore:start 
-            var now = new Date();
-            var data = `<?xml version="1.0" encoding="utf-8"?>
+  _buildValidateReqOptions(req) {
+      var service = url.parse(this.serviceUrl);
+      service.pathname = url.parse(req.originalUrl).pathname;
+      service.query = {};
+      for (var key in req.query) {
+        if (req.query.hasOwnProperty(key) && key !== 'ticket') {
+          service.query[key] = req.query[key];
+        }
+      }
+      service = url.format(service);
+      // jshint ignore:start 
+      var now = new Date();
+      var data = `<?xml version="1.0" encoding="utf-8"?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header/>
         <SOAP-ENV:Body>
@@ -44,11 +44,13 @@ class CasClient extends AbstractCasClient {
       </SOAP-ENV:Envelope>`;
       // jshint ignore:end
     return {
+      method: 'POST',
+      url: {
       host: this.validateUrl.host,
-      method: this.validateUrl.method,
       port: 'POST',
       pathname: this.validateUrl.pathname,
-      query: { TARGET: service, ticket: '' },
+      query: { TARGET: service, ticket: '' }
+      },
       headers: {
         'Content-Type': 'text/xml',
         'Content-Length': Buffer.byteLength(data) // jshint ignore:line
