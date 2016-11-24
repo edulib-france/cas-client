@@ -34,6 +34,7 @@ class CasClient extends AbstractCasClient {
       url : { 
         host: this.validateUrl.host,
         pathname: this.validateUrl.pathname,
+        protocol: this.validateUrl.protocol,
         query: { service, ticket: req.query.ticket }
       }
     };

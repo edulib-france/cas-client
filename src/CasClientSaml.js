@@ -46,10 +46,10 @@ class CasClient extends AbstractCasClient {
     return {
       method: 'POST',
       url: {
-      host: this.validateUrl.host,
-      port: 'POST',
-      pathname: this.validateUrl.pathname,
-      query: { TARGET: service, ticket: '' }
+        host: this.validateUrl.host,
+        pathname: this.validateUrl.pathname,
+        protocol: this.validateUrl.protocol,
+        query: { TARGET: service, ticket: '' }
       },
       headers: {
         'Content-Type': 'text/xml',
