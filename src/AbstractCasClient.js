@@ -22,20 +22,22 @@ class AbstractCasClient {
     if (options.debug === true) { this.logger.setLvl('debug'); }
     this.cas = {
       serviceUrl: options.cas.serviceUrl,
+      serverUrl: options.cas.serverUrl,
       loginUrl: options.cas.loginUrl.startsWith('/') ?
         options.cas.loginUrl : `/${options.cas.loginUrl}`,
       validateUrl: options.cas.validateUrl.startsWith('/') ?
         options.cas.validateUrl : `/${options.cas.validateUrl}`,
       logoutUrl: options.cas.logoutUrl.startsWith('/') ?
         options.cas.logoutUrl : `/${options.cas.logoutUrl}`,
-      reniew: options.cas.reniew === true
+      renew: options.cas.renew === true
     };
     this.sessionName = options.sessionName || DefaultSessionName;
     this.serviceUrl = this.cas.serviceUrl;
-    this.loginUrl = url.resolve(this.cas.serviceUrl, this.cas.loginUrl);
+    this.serverUrl = this.cas.serverUrl;
+    this.loginUrl = url.resolve(this.cas.serverUrl, this.cas.loginUrl);
     this.validateUrl =
-      url.parse(url.resolve(this.cas.serviceUrl, this.cas.validateUrl));
-    this.logoutUrl = url.resolve(this.cas.serviceUrl, this.cas.logoutUrl);
+      url.parse(url.resolve(this.cas.serverUrl, this.cas.validateUrl));
+    this.logoutUrl = url.resolve(this.cas.serverUrl, this.cas.logoutUrl);
     this.logger.debug({
       cas: this.cas,
       sessionName: this.sessionName,
