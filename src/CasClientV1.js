@@ -18,22 +18,16 @@ class CasClient extends AbstractCasClient {
   }
 
   _buildValidateReqOptions(req) {
-    var service = url.parse(this.serviceUrl);
-    service.pathname = url.parse(req.originalUrl).pathname;
-    service.query = {};
-    for (var key in req.query) {
-      if (req.query.hasOwnProperty(key) && key !== 'ticket') {
-        service.query[key] = req.query[key];
-      }
-    }
-    service = url.format(service);
     return {
       method: 'GET',
-      url : url.format({ 
+      url: url.format({
         host: this.validateUrl.host,
         pathname: this.validateUrl.pathname,
         protocol: this.validateUrl.protocol,
-        query: { service, ticket: req.query.ticket }
+        query: {
+          service: this._buildService(req),
+          ticket: req.query.ticket
+        }
       })
     };
   }
