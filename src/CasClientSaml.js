@@ -10,34 +10,34 @@ const DefaultLogoutUrl = '/logout';
 
 class CasClient extends AbstractCasClient {
 
-  constructor(options) {
-    options = options || {};
-    options.cas = options.cas || {};
-    options.cas.loginUrl = options.cas.loginUrl || DefaultLoginUrl;
-    options.cas.validateUrl = options.cas.validateUrl || DefaultValidateUrl;
-    options.cas.logoutUrl = options.cas.logoutUrl || DefaultLogoutUrl;
-    super(options);
-  }
+    constructor(options) {
+        options = options || {};
+        options.cas = options.cas || {};
+        options.cas.loginUrl = options.cas.loginUrl || DefaultLoginUrl;
+        options.cas.validateUrl = options.cas.validateUrl || DefaultValidateUrl;
+        options.cas.logoutUrl = options.cas.logoutUrl || DefaultLogoutUrl;
+        super(options);
+    }
 
-  _buildValidateReqOptions(req) {
-      var service = url.parse(this.serviceUrl);
-      service.pathname = url.parse(req.originalUrl).pathname;
-      service.query = {};
-      for (var key in req.query) {
-        if (req.query.hasOwnProperty(key) && key !== 'ticket') {
-          service.query[key] = req.query[key];
-        }
-      }
-      service = url.format(service);
-      // jshint ignore:start 
-      var data =
-      `<?xml version="1.0" encoding="utf-8"?>
+    _buildValidateReqOptions(req) {
+            var service = url.parse(this.serviceUrl);
+            service.pathname = url.parse(req.originalUrl).pathname;
+            service.query = {};
+            for (var key in req.query) {
+                if (req.query.hasOwnProperty(key) && key !== 'ticket') {
+                    service.query[key] = req.query[key];
+                }
+            }
+            service = url.format(service);
+            // jshint ignore:start 
+            var now = new Date();
+            var data = `<?xml version="1.0" encoding="utf-8"?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header/>
         <SOAP-ENV:Body>
           <samlp:Request xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" MajorVersion="1"
-            MinorVersion="1" RequestID="_${req.get(`host`)}.${Date.now().getTime()}"
-            IssueInstant="${Date.now().toISOString()}">
+            MinorVersion="1" RequestID="_${req.get(`host`)}.${now.getTime()}"
+            IssueInstant="${now.toISOString()}">
             <samlp:AssertionArtifact>${req.query.ticket}</samlp:AssertionArtifact>
           </samlp:Request>
         </SOAP-ENV:Body>
