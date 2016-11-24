@@ -45,12 +45,12 @@ class CasClient extends AbstractCasClient {
       // jshint ignore:end
     return {
       method: 'POST',
-      url: {
+      url: url.format({
         host: this.validateUrl.host,
         pathname: this.validateUrl.pathname,
         protocol: this.validateUrl.protocol,
         query: { TARGET: service, ticket: '' }
-      },
+      }),
       headers: {
         'Content-Type': 'text/xml',
         'Content-Length': Buffer.byteLength(data) // jshint ignore:line

@@ -49,8 +49,8 @@ class AbstractCasClient {
   }
 
   login(req, res, next) {
-    if (req.session && req.session[this.sessionName]) { next(); }
-    if (req.query && req.query.ticket) { next(); }
+    if (req.session && req.session[this.sessionName]) { return next(); }
+    if (req.query && req.query.ticket) { return next(); }
     res.redirect(this.loginUrl);
   }
 

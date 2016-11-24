@@ -31,12 +31,12 @@ class CasClient extends AbstractCasClient {
     service = url.format(service);
      return {
       method: 'GET',
-      url : { 
+      url : url.format({ 
         host: this.validateUrl.host,
         pathname: this.validateUrl.pathname,
         protocol: this.validateUrl.protocol,
         query: { service, ticket: req.query.ticket }
-      }
+      })
     };
   }
 
