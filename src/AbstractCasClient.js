@@ -12,6 +12,7 @@ class AbstractCasClient {
       throw new Error('missing or invalid options');
     }
     if (!options.cas.serviceUrl) { throw new Error('missing cas service url'); }
+    if (!options.cas.serverUrl) { throw new Error('missing cas server url'); }
     if (!options.cas.loginUrl) { throw new Error('missing cas login url'); }
     if (!options.cas.validateUrl) {
       throw new Error('missing cas validate url');
