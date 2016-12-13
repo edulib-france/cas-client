@@ -96,8 +96,8 @@ class CasClient extends AbstractCasClient {
         var thisAttrValue;
         if (attr.attributevalue instanceof Array) {
           thisAttrValue = [];
-          attr.attributevalue.forEach((v) => thisAttrValue.push(v._));
-        } else { thisAttrValue = attr.attributevalue._; }
+          attr.attributevalue.forEach((v) => thisAttrValue.push(v));
+        } else { thisAttrValue = attr.attributevalue; }
         data[attr.$.AttributeName] = thisAttrValue;
       });
       return cb(null, data);
