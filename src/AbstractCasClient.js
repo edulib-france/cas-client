@@ -36,7 +36,7 @@ class AbstractCasClient {
     this.sessionName = options.sessionName || DefaultSessionName;
     this.serviceUrl = this.cas.serviceUrl;
     this.serverUrl = this.cas.serverUrl;
-    this.loginUrl = urljoin(this.cas.serverUrl, this.cas.loginUrl);
+    this.loginUrl = url.parse(urljoin(this.cas.serverUrl, this.cas.loginUrl));
     this.validateUrl =
       url.parse(urljoin(this.cas.serverUrl, this.cas.validateUrl));
     this.logoutUrl = urljoin(this.cas.serverUrl, this.cas.logoutUrl);
@@ -52,7 +52,14 @@ class AbstractCasClient {
   login(req, res, next) {
     if (req.session && req.session[this.sessionName]) { return next(); }
     if (req.query && req.query.ticket) { return next(); }
-    res.redirect(this.loginUrl);
+    res.redirect(url.format({
+      host: this.loginUrl.host,
+      pathname: this.loginUrl.pathname,
+      protocol: this.loginUrl.protocol,
+      query: {
+        service: this._buildService(req)
+      }
+    }));
   }
 
   validate(req, res, next) {
@@ -80,6 +87,18 @@ class AbstractCasClient {
       delete req.session[this.sessionName];
     }
     res.redirect(this.logoutUrl);
+  }
+
+  _buildService(req) {
+    var service = url.parse(this.serviceUrl);
+    service.pathname = url.parse(req.originalUrl).pathname;
+    service.query = {};
+    for (var key in req.query) {
+      if (req.query.hasOwnProperty(key) && key !== 'ticket') {
+        service.query[key] = req.query[key];
+      }
+    }
+    return url.format(service);
   }
 
   _buildValidateReqOptions() {
