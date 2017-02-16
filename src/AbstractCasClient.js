@@ -9,44 +9,13 @@ const DefaultSessionName = 'cas';
 class AbstractCasClient {
 
   constructor(options) {
-    if (!options || !options.cas) {
-      throw new Error('missing or invalid options');
-    }
-    if (!options.cas.serviceUrl) {
-      throw new Error('missing cas service url');
-    }
-    if (!options.cas.serverUrl) {
-      throw new Error('missing cas server url');
-    }
-    if (!options.cas.loginUrl) {
-      throw new Error('missing cas login url');
-    }
-    if (!options.cas.validateUrl) {
-      throw new Error('missing cas validate url');
-    }
-    if (!options.cas.logoutUrl) {
-      throw new Error('missing cas logout url');
-    }
+    this.__validate(options);
     this.options = options;
     this.logger = new Logger(options.logger);
     if (options.debug === true) {
       this.logger.setLvl('debug');
     }
-    this.cas = {
-      serviceUrl: options.cas.serviceUrl,
-      serverUrl: options.cas.serverUrl,
-      loginUrl: options.cas.loginUrl.startsWith('/') ?
-        options.cas.loginUrl : `/${options.cas.loginUrl}`,
-      validateUrl: options.cas.validateUrl.startsWith('/') ?
-        options.cas.validateUrl : `/${options.cas.validateUrl}`,
-      proxyValidateUrl: options.cas.proxyValidateUrl &&
-        options.cas.proxyValidateUrl.startsWith('/') ?
-        options.cas.proxyValidateUrl : `/${options.cas.proxyValidateUrl}`,
-      logoutUrl: options.cas.logoutUrl.startsWith('/') ?
-        options.cas.logoutUrl : `/${options.cas.logoutUrl}`,
-      renew: options.cas.renew === true,
-      proxy: options.cas.proxy === true,
-    };
+    this.__setupCAS();
     this.sessionName = options.sessionName || DefaultSessionName;
     this.serviceUrl = this.cas.serviceUrl;
     this.serverUrl = this.cas.serverUrl;
@@ -68,6 +37,46 @@ class AbstractCasClient {
     });
   }
 
+  __validate(options) {
+    if (!options || !options.cas) {
+      throw new Error('missing or invalid options');
+    }
+    if (!options.cas.serviceUrl) {
+      throw new Error('missing cas service url');
+    }
+    if (!options.cas.serverUrl) {
+      throw new Error('missing cas server url');
+    }
+    if (!options.cas.loginUrl) {
+      throw new Error('missing cas login url');
+    }
+    if (!options.cas.validateUrl) {
+      throw new Error('missing cas validate url');
+    }
+    if (!options.cas.logoutUrl) {
+      throw new Error('missing cas logout url');
+    }
+  }
+
+  __setupCAS() {
+    this.cas = {
+      serviceUrl: this.options.cas.serviceUrl,
+      serverUrl: this.options.cas.serverUrl,
+      loginUrl: this.options.cas.loginUrl.startsWith('/') ?
+        this.options.cas.loginUrl : `/${this.options.cas.loginUrl}`,
+      validateUrl: this.options.cas.validateUrl.startsWith('/') ?
+        this.options.cas.validateUrl : `/${this.options.cas.validateUrl}`,
+      proxyValidateUrl: this.options.cas.proxyValidateUrl &&
+        this.options.cas.proxyValidateUrl.startsWith('/') ?
+        this.options.cas.proxyValidateUrl :
+        `/${this.options.cas.proxyValidateUrl}`,
+      logoutUrl: this.options.cas.logoutUrl.startsWith('/') ?
+        this.options.cas.logoutUrl : `/${this.options.cas.logoutUrl}`,
+      renew: this.options.cas.renew === true,
+      proxy: this.options.cas.proxy === true,
+    };
+  }
+
   login(req, res, next) {
     if (req.session && req.session[this.sessionName]) {
       return next();
@@ -75,14 +84,16 @@ class AbstractCasClient {
     if (req.query && req.query.ticket) {
       return next();
     }
-    res.redirect(url.format({
+    var redirect = url.format({
       host: this.loginUrl.host,
       pathname: this.loginUrl.pathname,
       protocol: this.loginUrl.protocol,
       query: {
         service: this._buildService(req)
       }
-    }));
+    });
+    this.logger.debug('login redirect', redirect);
+    res.redirect(redirect);
   }
 
   validate(req, res, next) {
@@ -93,6 +104,7 @@ class AbstractCasClient {
       next(new Error('missing cas ticket'));
     }
     var options = this._buildValidateReqOptions(req);
+    this.logger.debug('validate options', options);
     request(options, (err, res, body) => {
       if (err) {
         return next(err);
@@ -115,6 +127,7 @@ class AbstractCasClient {
     if (req.session && req.session[this.sessionName]) {
       delete req.session[this.sessionName];
     }
+    this.logger.debug('logout redirect', this.logoutUrl);
     res.redirect(this.logoutUrl);
   }
 

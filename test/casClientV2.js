@@ -8,7 +8,9 @@ console.log('##### Test Cas Client V2');
 
 console.log('\t no cas service url');
 assert.throws(
-  () => new CasClientV2({ cas: {} }), /missing cas service url/,
+  () => new CasClientV2({
+    cas: {}
+  }), /missing cas service url/,
   `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
 console.log('\t valid options');
@@ -31,6 +33,7 @@ assert.doesNotThrow(
       proxy: true
     }
   }), `\t\t${colors.red('ko')}`);
-  assert.equal(test.proxy, true, `\t\t${colors.red('ko')}`);
-  assert.equal(test.proxyValidateUrl.href, 'https://server/proxyValidate', `\t\t${colors.red('ko')}`);
+assert.equal(test.proxy, true, `\t\t${colors.red('ko')}`);
+assert.equal(test.proxyValidateUrl.href, 'https://server/proxyValidate',
+  `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
