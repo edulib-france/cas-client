@@ -7,6 +7,7 @@ const AbstractCasClient = require('./AbstractCasClient');
 const DefaultLoginUrl = '/login';
 const DefaultValidateUrl = '/serviceValidate';
 const DefaultLogoutUrl = '/logout';
+const DefaultProxyValidateUrl = '/proxyValidate';
 
 class CasClient extends AbstractCasClient {
 
@@ -15,17 +16,20 @@ class CasClient extends AbstractCasClient {
     options.cas = options.cas || {};
     options.cas.loginUrl = options.cas.loginUrl || DefaultLoginUrl;
     options.cas.validateUrl = options.cas.validateUrl || DefaultValidateUrl;
+    options.cas.proxyValidateUrl = options.cas.proxyValidateUrl ||
+      DefaultProxyValidateUrl;
     options.cas.logoutUrl = options.cas.logoutUrl || DefaultLogoutUrl;
     super(options);
   }
 
   _buildValidateReqOptions(req) {
+    var validateUrl = this[this.proxy ? 'proxyValidateUrl' : 'validateUrl'];
     return {
       method: 'GET',
       url: url.format({
-        host: this.validateUrl.host,
-        pathname: this.validateUrl.pathname,
-        protocol: this.validateUrl.protocol,
+        host: validateUrl.host,
+        pathname: validateUrl.pathname,
+        protocol: validateUrl.protocol,
         query: {
           service: this._buildService(req),
           ticket: req.query.ticket
@@ -41,7 +45,9 @@ class CasClient extends AbstractCasClient {
       explicitArray: false,
       tagNameProcessors: [XMLprocessors.normalize, XMLprocessors.stripPrefix]
     }, (err, result) => {
-      if (err) { return cb(new Error(`invalid CAS server response, ${err}`)); }
+      if (err) {
+        return cb(new Error(`invalid CAS server response, ${err}`));
+      }
       if (!result) {
         return cb(new Error(`invalid CAS server response, empty result`));
       }

@@ -15,7 +15,22 @@ console.log('\t valid options');
 assert.doesNotThrow(
   () => new CasClientV2({
     cas: {
-      serviceUrl: 'https://cas-service'
+      serviceUrl: 'https://cas-service',
+      serverUrl: 'https://server'
     }
   }), `\t\t${colors.red('ko')}`);
+console.log(`\t\t${colors.green('ok')}`);
+
+console.log('\t valid options with proxy');
+var test;
+assert.doesNotThrow(
+  () => test = new CasClientV2({
+    cas: {
+      serviceUrl: 'https://cas-service',
+      serverUrl: 'https://server',
+      proxy: true
+    }
+  }), `\t\t${colors.red('ko')}`);
+  assert.equal(test.proxy, true, `\t\t${colors.red('ko')}`);
+  assert.equal(test.proxyValidateUrl.href, 'https://server/proxyValidate', `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);

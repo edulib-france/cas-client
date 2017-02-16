@@ -15,7 +15,8 @@ console.log('\t valid options');
 assert.doesNotThrow(
   () => new CasClientV3({
     cas: {
-      serviceUrl: 'https://cas-service'
+      serviceUrl: 'https://cas-service',
+      serverUrl: 'https://server'
     }
   }), `\t\t${colors.red('ko')}`);
 console.log(`\t\t${colors.green('ok')}`);
