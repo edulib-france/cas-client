@@ -27,14 +27,6 @@ class AbstractCasClient {
     this.logoutUrl = urljoin(this.cas.serverUrl, this.cas.logoutUrl);
     this.renew = this.cas.renew;
     this.proxy = this.cas.proxy;
-    this.logger.debug({
-      cas: this.cas,
-      sessionName: this.sessionName,
-      loginUrl: this.loginUrl,
-      validateUrl: this.validateUrl,
-      proxyValidateUrl: this.proxyValidateUrl,
-      logoutUrl: this.logoutUrl
-    });
   }
 
   __validate(options) {
