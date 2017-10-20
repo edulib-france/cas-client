@@ -87,6 +87,7 @@ class CasClient extends AbstractCasClient {
       var data = { user };
       if (!(attrs instanceof Array)) { attrs = [attrs]; }
       attrs.forEach((attr) => {
+        if (!attr) return;
         var thisAttrValue;
         if (attr.attributevalue instanceof Array) {
           thisAttrValue = [];
