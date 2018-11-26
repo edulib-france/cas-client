@@ -82,11 +82,14 @@ class CasClient extends AbstractCasClient {
         samlResponse.assertion.authenticationstatement.subject ?
         samlResponse.assertion.authenticationstatement.subject.nameidentifier :
         null;
-      var attrs = samlResponse.assertion.attributestatement ?
+      var attrs = samlResponse.assertion &&
+        samlResponse.assertion.attributestatement &&
+        samlResponse.assertion.attributestatement.attribute ?
         samlResponse.assertion.attributestatement.attribute : [];
       var data = { user };
       if (!(attrs instanceof Array)) { attrs = [attrs]; }
       attrs.forEach((attr) => {
+        if (!attr) return;
         var thisAttrValue;
         if (attr.attributevalue instanceof Array) {
           thisAttrValue = [];
