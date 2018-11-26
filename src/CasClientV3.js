@@ -67,6 +67,7 @@ class CasClient extends AbstractCasClient {
         return cb(null, data);
       });
     } catch (err) {
+      this.logger.error(err);
       return cb(new Error(`invalid CAS server response, invalid format`));
     }
   }
