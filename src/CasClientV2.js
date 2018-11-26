@@ -39,36 +39,40 @@ class CasClient extends AbstractCasClient {
   }
 
   _parseCasResponse(body, cb) {
-    parseXML(body, {
-      trim: true,
-      normalize: true,
-      explicitArray: false,
-      tagNameProcessors: [XMLprocessors.normalize, XMLprocessors.stripPrefix]
-    }, (err, result) => {
-      if (err) {
-        return cb(new Error(`invalid CAS server response, ${err}`));
-      }
-      if (!result) {
-        return cb(new Error(`invalid CAS server response, empty result`));
-      }
-      var res = result.serviceresponse;
-      var failure = res ? res.authenticationfailure : null;
-      var success = res ? res.authenticationsuccess : null;
-      if (!failure && !success) {
-        return cb(new Error(`invalid CAS server response, invalid format`));
-      }
-      if (failure) {
-        return cb(new Error(
-          `CAS authentication failed (${failure.$.code}), ${failure._}`));
-      }
-      var data = {};
-      for (var prop in success) {
-        if (success.hasOwnProperty(prop)) {
-          data[prop] = success[prop];
+    try {
+      parseXML(body, {
+        trim: true,
+        normalize: true,
+        explicitArray: false,
+        tagNameProcessors: [XMLprocessors.normalize, XMLprocessors.stripPrefix]
+      }, (err, result) => {
+        if (err) {
+          return cb(new Error(`invalid CAS server response, ${err}`));
         }
-      }
-      return cb(null, data);
-    });
+        if (!result) {
+          return cb(new Error(`invalid CAS server response, empty result`));
+        }
+        var res = result.serviceresponse;
+        var failure = res ? res.authenticationfailure : null;
+        var success = res ? res.authenticationsuccess : null;
+        if (!failure && !success) {
+          return cb(new Error(`invalid CAS server response, invalid format`));
+        }
+        if (failure) {
+          return cb(new Error(
+            `CAS authentication failed (${failure.$.code}), ${failure._}`));
+        }
+        var data = {};
+        for (var prop in success) {
+          if (success.hasOwnProperty(prop)) {
+            data[prop] = success[prop];
+          }
+        }
+        return cb(null, data);
+      });
+    } catch (err) {
+      return cb(new Error(`invalid CAS server response, invalid format`));
+    }
   }
 
 }
