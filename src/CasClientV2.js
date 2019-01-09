@@ -40,6 +40,7 @@ class CasClient extends AbstractCasClient {
 
   _parseCasResponse(body, cb) {
     try {
+      this.logger.debug('CASClientV2::parseCasResponse  body:', body);
       parseXML(body, {
         trim: true,
         normalize: true,

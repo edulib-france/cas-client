@@ -33,6 +33,7 @@ class CasClient extends AbstractCasClient {
   }
 
   _parseCasResponse(body, cb) {
+    this.logger.debug('CASClientV1::parseCasResponse  body:', body);
     if (!body) { return cb(new Error('invalid CAS server response')); }
     var lines = body.split('\n');
     if (lines[0] === 'yes' && lines.length >= 2) {
